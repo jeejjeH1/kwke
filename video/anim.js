@@ -124,17 +124,17 @@ function sparkle(x, y, r, rot = 0, col = C.claude, a = 1) {
 }
 
 // ---------- the gem (logo, rebuilt as vectors) ----------
+// Facets traced from the official logo PNG (convex hulls of each facet, 400px space).
 const GEM = [
-  [[95, 233], [196, 106], [264, 205], [166, 346]],
-  [[113, 197], [190, 49], [194, 99]],
-  [[199, 48], [276, 79], [268, 196], [203, 101]],
-  [[279, 106], [301, 192], [272, 207]],
-  [[267, 213], [300, 199], [298, 322], [171, 352]],
+  [[96, 234], [191, 108], [263, 199], [264, 204], [168, 346], [165, 346], [102, 247]],
+  [[119, 191], [167, 103], [191, 60], [191, 75], [189, 100], [174, 121], [119, 194]],
+  [[198, 55], [200, 50], [274, 82], [276, 88], [267, 189], [266, 193], [196, 101]],
+  [[272, 197], [280, 110], [281, 109], [301, 230], [301, 235], [297, 231], [277, 207]],
+  [[171, 354], [267, 210], [270, 207], [299, 242], [301, 249], [262, 355], [172, 355]],
 ];
-const GEM_SHADE = [0, 0, 1, 3, 2];
-const GEM_LIGHT = ['#523542', '#6B4E5C', '#7C6270', '#8E7684'];
-const GEM_DARK = ['#6E4A5B', '#8A6676', '#9E8090', '#B59BA8'];
-const GEM_CX = 198, GEM_CY = 200, GEM_H = 304;
+const GEM_REAL = ['#593E4A', '#634A55', '#6E5761', '#8A7A82', '#756069'];
+const GEM_LIGHT = GEM_REAL, GEM_DARK = GEM_REAL;
+const GEM_CX = 198.5, GEM_CY = 202.5, GEM_H = 305;
 const GEM_SCATTER = (() => { const r = rng(7); return GEM.map(() => ({ a: r() * Math.PI * 2, d: 500 + r() * 400, rot: (r() - .5) * 3, s: 0.3 + r() * 0.4 })); })();
 // ps: per-facet progress (1 = assembled)
 function gem(cx, cy, h, o = {}) {
@@ -150,7 +150,7 @@ function gem(cx, cy, h, o = {}) {
     ctx.translate(cx + (cxF - GEM_CX) * k + Math.cos(sc.a) * sc.d * q * (o.spread ?? 1), cy + (cyF - GEM_CY) * k + Math.sin(sc.a) * sc.d * q * (o.spread ?? 1));
     ctx.rotate(sc.rot * q); const s = lerp(1, sc.s, q); ctx.scale(s, s);
     poly(pts.map(([x, y]) => [(x - cxF) * k, (y - cyF) * k]));
-    ctx.fillStyle = o.flash ? mix(pal[GEM_SHADE[i]], '#FFFFFF', o.flash) : pal[GEM_SHADE[i]];
+    ctx.fillStyle = o.flash ? mix(pal[i], '#FFFFFF', o.flash) : pal[i];
     if (o.glow) { ctx.shadowColor = C.mauve; ctx.shadowBlur = o.glow; }
     ctx.fill();
     if (o.outline) { ctx.strokeStyle = o.outline; ctx.lineWidth = 1.5; ctx.stroke(); }
@@ -344,7 +344,7 @@ DRAW.intro = (lt) => {
   const move = eio3(prog(lt, 3.0, 1.0));
   const gx = lerp(960, 670, move), gy = 540, gh = lerp(440, 300, move);
   const ps = GEM.map((_, i) => eoX(prog(lt, 1.25 + i * 0.08, 0.9)));
-  const flash = Math.max(0, 1 - prog(lt, 2.05, 0.6)) * (lt > 2.0 ? 0.6 : 0);
+  const flash = Math.max(0, 1 - prog(lt, 2.05, 0.6)) * (lt > 2.0 ? 0.3 : 0);
   gem(gx, gy, gh, { ps, flash, glow: 40 * flash });
   // shockwaves
   for (let k = 0; k < 3; k++) {
@@ -751,7 +751,7 @@ DRAW.outro = (lt) => {
   }
   if (lt > 2.7) {
     const ps = GEM.map((_, i) => eoX(prog(lt, 2.8 + i * 0.07, 0.9)));
-    const flash = lt > 3.4 ? Math.max(0, 1 - prog(lt, 3.4, 0.6)) * 0.6 : 0;
+    const flash = lt > 3.4 ? Math.max(0, 1 - prog(lt, 3.4, 0.6)) * 0.3 : 0;
     const breathe = 1 + Math.sin(lt * 2) * 0.006;
     gem(960, 420, 300 * breathe, { ps, flash, glow: 40 * flash });
     for (let k = 0; k < 3; k++) {
